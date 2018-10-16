@@ -1,2 +1,3 @@
-# FP_vaje
-financni praktikum, vaje na faksu
+# Finančni praktikum vaje
+
+vaje, ki jih delamo na faksu
