@@ -53,6 +53,7 @@ legend("topright",legend=c('6m', '9m'), col=c('green','red'),lty=1:1,cex=1.0)
 #b.) 
 sesti_mesec <- zdruzeno$'6m'
 dvanajsti_mesec <- zdruzeno$'12m'
+
 zdruzeno <- t(zdruzeno)
 obrestna_mera <- as.data.frame(zdruzeno) %>%
   subset(select=c('X1.10.2008', 'X2.03.2009', 'X01.04.2010'))
@@ -74,12 +75,12 @@ drugi_graf <- ggplot(obrestna_mera, aes(x=dospetje, y=obrestna_mera,group=datum,
 
 #3a) Terminske obrestne mere tipa TxU
 terminske_obr_mere <- subset(t(zdruzeno), select = c('6m','12m'))
-terminske_obr_mere$'Napoved' <- (1/(12-6)*((1+12*dvanajsti_mesec)/(1+6*sesti_mesec)-1))
-terminske_obr_mere$'Napoved' <- c(c(NA, NA, NA,NA,NA),terminske_obr_mere$'Napoved'[-c(31:36)])
-
+napovedi<- c((1/(12-6)*((1+12*dvanajsti_mesec)/(1+6*sesti_mesec)-1)))
+tabela <-cbind(terminske_obr_mere,napovedi)
 
 #3b) Terminska obrestna mera meseca 12-6= 6 
-terminske_obr_mere$'6 mesec' <- sesti_mesec
+tabela
 
-View(terminske_obr_mere)
+
+
 
