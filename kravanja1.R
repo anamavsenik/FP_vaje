@@ -13,48 +13,60 @@ library(combinat)
 library(shiny)
 
 #1.NALOGA
-sl <- locale(encoding = "Windows-1250", decimal_mark = ",", grouping_mark = ".")
-
-tabela2008 <- read_csv2("Copy of hist_EURIBOR_2008.csv",locale = sl, trim_ws = TRUE,
-                        na = c("-", ""))
-nova2008 <- tabela2008[,c("X1", "2.01.2008","1.02.2008","3.03.2008","1.04.2008","2.05.2008","2.06.2008","1.07.2008","1.08.2008","1.09.2008","1.10.2008","3.11.2008","1.12.2008")]
+tabela2008 <- read.csv2("Copy of hist_EURIBOR_2008.csv",header = TRUE, sep = ";", quote = "\"", dec = ",", nrows = 15,row.names = 1,
+                        fill = TRUE, comment.char = "",na = c("-", ""))
+nova2008 <- tabela2008[,c( "X2.01.2008","X1.02.2008","X3.03.2008","X1.04.2008","X2.05.2008","X2.06.2008","X1.07.2008","X1.08.2008","X1.09.2008","X1.10.2008","X3.11.2008","X1.12.2008")]
 nova2008 <- t(nova2008[1:15,])
-imena <- as.character(unlist(nova2008[1,]))
-nova2008 <- nova2008[-1,]
-colnames(nova2008) <- imena
 
-tabela2009 <- read_csv2("Copy of hist_EURIBOR_2009.csv",locale = sl, trim_ws = TRUE,
-                        na = c("-", ""))
-#View(tabela2009)
-#View(nova2008)
-nova2009 <- tabela2009[,c("2.01.2009","2.02.2009","2.03.2009","1.04.2009","4.05.2009","1.06.2009","1.07.2009","3.08.2009","1.09.2009","1.10.2009","2.11.2009","1.12.2009")]
+tabela2009 <- read.csv2("Copy of hist_EURIBOR_2009.csv",sep = ";", quote = "\"", dec = ",", nrows = 15,
+                        fill = TRUE,na = c("-", ""))
+
+nova2009 <- tabela2009[,c("X2.01.2009","X2.02.2009","X2.03.2009","X1.04.2009","X4.05.2009","X1.06.2009","X1.07.2009","X3.08.2009","X1.09.2009","X1.10.2009","X2.11.2009","X1.12.2009")]
 nova2009 <- t(nova2009[1:15,])
 
-tabela2010 <- read_csv2("Copy of hist_EURIBOR_2010.csv",locale = sl, trim_ws = TRUE,
-                        na = c("-", ""))
-#View(tabela2010)
-#View(nova2009)
-nova2010 <- tabela2010[,c("04/01/2010","01/02/2010","01/03/2010","01/04/2010","03/05/2010","01/06/2010","01/07/2010","02/08/2010","01/09/2010","01/10/2010","01/11/2010","01/12/2010")]
-nova2010 <- t(nova2010[1:15,])
-#View(nova2010)
+tabela2010 <- read.csv2("Copy of hist_EURIBOR_2010.csv",sep = ";", quote = "\"", dec = ",", nrows = 15,
+                        fill = TRUE,na = c("-", ""))
 
-zdruzeno <-rbind(nova2008,nova2009,nova2010) %>%
+nova2010 <- tabela2010[,c("X04.01.2010","X01.02.2010","X01.03.2010","X01.04.2010","X03.05.2010","X01.06.2010","X01.07.2010","X02.08.2010","X01.09.2010","X01.10.2010","X01.11.2010","X01.12.2010")]
+nova2010 <- t(nova2010[1:15,])
+
+
+zdruzeno<-rbind(nova2008,nova2009,nova2010) %>%
   subset(elect=c(1,2,4,5,6,9,12,15))%>%
   as.data.frame()
-zdruzeno <- zdruzeno[,c(9,15)]
+#zdruzeno <- zdruzeno[,c(9,15)]
 View(zdruzeno)
 
 zdruzeno[] <- lapply(zdruzeno,as.character) %>% lapply(as.numeric)
 
+graf_6m <- ts(zdruzeno$'9', start=c(2008,1),frequency =12)
+graf_12m <- ts(zdruzeno$'15',start=c(2008,1),frequency = 12)
 
-graf_6m <- ts(zdruzeno$'6m', start=c(2008,1),frequency =12)
-graf_12m <- ts(zdruzeno$'12m',start=c(2008,1),frequency = 12)
-
-ts.plot(zdruzeno , xlab='dan',ylab='obrestna mera (%)', main = 'Euribor 2008-2010', col=c('green','red'), lwd=2)
+ts.plot(graf_6m ,graf_12m, xlab='obdobje',ylab='obrestna mera (%)', main = 'Euribor 2008-2010', col=c('green','red'), lwd=2)
 legend("topright",legend=c('6m', '9m'), col=c('green','red'),lty=1:1,cex=1.0)
 
 
 
 #2.naloga
+#a.) Izbrala sem si datume : 1.10.2008, 2.3.2009 in 1.4.2010
 
+#b.) 
+zdruzeno <- t(zdruzeno)
+obrestna_mera <- as.data.frame(zdruzeno) %>%
+  subset(select=c('X1.10.2008', 'X2.03.2009', 'X01.04.2010'))
+
+obrestna_mera$dospetje <- c(0.25,0.5,0.75,1,2,3,4,5,6,7,8,9,10,11,12)
+obrestna_mera <- melt(obrestna_mera,id.vars='dospetje',variable.name = 'datum', value.name = 'obrestna_mera' )
+
+drugi_graf <- ggplot(obrestna_mera, aes(x=dospetje, y=obrestna_mera,group=datum, color = datum)) +
+      geom_line() + geom_point() +
+  labs(title='Èasovna struktura obrestnih mer', y='obrestna mera (%)',x='Dospetje(v mesecih)')
+
+#opazke: Pri vseh grafih je obrestna mera za daljša obdobja višja kot za krajša. 
+# Krivulji za leto 2008 in 2009 sta konkavni, medtem ko je za leto 2010 krivulja konveksna. 
+#Za tedenska obdobja je strmina seveda veèja, za meseèna manjša oziroma v nekaterih delih skoraj ravna. 
+#Z leti so se obresne mere, sodeè po grafu, nižale.
+
+
+#3.naloga
 
