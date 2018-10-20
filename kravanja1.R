@@ -79,11 +79,22 @@ tabela <-cbind(terminske_obr_mere,napovedi)
 
 
 #3b) Terminska obrestna mera meseca 12-6= 6 
-napovedi2 <- c(c(NA, NA, NA, NA, NA, NA), napovedi[-c(31:36)])
-tabela2 <-cbind(terminske_obr_mere,napovedi2)
+napovedi <- c(c(NA, NA, NA, NA, NA, NA), napovedi[-c(31:36)])
+tabela2 <-cbind(terminske_obr_mere,napovedi)
 
 #3c) Razsevni grafikon, regresijska premica in simetrala kvadrantov
+leto <-c(seq(2008, 2008, length.out = 12),seq(2009, 2009, length.out = 12),seq(2010, 2010, length.out = 12))
+tabela3 <-cbind(tabela2,leto)
 
+
+nova_tabela <- data.frame(tabela3[-c(1:6),])
+
+tretji_graf <- ggplot(nova_tabela, aes(x=napovedi, y=nova_tabela$'X6m')) + 
+  geom_point(aes(colour = leto)) +
+  geom_abline() + 
+  geom_smooth(method ="lm") +
+  coord_cartesian(xlim=c(0.1,1.7),ylim=c(0.1,1.7)) + 
+  labs(title ='6 mesecev Euribor 2008-2010', y='opazovano')
 
 
 
