@@ -96,5 +96,33 @@ tretji_graf <- ggplot(nova_tabela, aes(x=napovedi, y=nova_tabela$'X6m')) +
   coord_cartesian(xlim=c(0.1,1.7),ylim=c(0.1,1.7)) + 
   labs(title ='6 mesecev Euribor 2008-2010', y='opazovano')
 
+#3d) Loèeni grafikoni in regresijske premice za posamezno leto
+leto2008 <- nova_tabela[c(1:6),]
+leto2009 <- nova_tabela[c(7:18),]
+leto2010 <- nova_tabela[c(19:30),]
 
+graf_leto2008 <- ggplot(leto2008, aes(x=napovedi, y=leto2008$'X6m')) + 
+  geom_point(aes(colour = leto)) +
+  geom_abline() + 
+  geom_smooth(method ="lm") + 
+  labs(title ='6 mesecev Euribor 2008', y='Opazovano')
 
+graf_leto2009 <- ggplot(leto2009, aes(x=napovedi, y=leto2009$'X6m')) + 
+  geom_point(aes(colour = leto)) +
+  geom_abline() + 
+  geom_smooth(method ="lm") +
+  labs(title ='6 mesecev Euribor 2009', y='Opazovano')
+
+graf_leto2010 <- ggplot(leto2010, aes(x=napovedi, y=leto2010$'X6m')) + 
+  geom_point(aes(colour = leto)) +
+  geom_abline() + 
+  geom_smooth(method ="lm") +
+  labs(title ='6 mesecev Euribor 2010', y='Opazovano')
+
+#3e) Kako bi morali izgledati grafikoni v nalogah (c) in (d) pod pogojem, da hipoteza
+# prièakovanj trga velja? Ali empirièni podatki potrjujejo hipotezo?
+#Da bi hipoteza veljala, bi morali biti napovedana obrestna mera, ki smo jo izraèunali in
+#opazovana obrestna mera, ki je na trgu veljala, enaki. Toèke bi leale na simetrali lihih kvadrantov, regresijska 
+#premica bi bila enaka kot je simetrala. V mojem primeru podatki ne ustrezajo hipotezi, odtopanja so ogromna. 
+#Še najbolši pribliek dobimo v letu 2009, vendar èe pogledamo graf_leto2009 vidimo, da je odstopanje 
+#še vseeno ogromno.
