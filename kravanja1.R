@@ -1,4 +1,3 @@
-require(graphics)
 library(knitr)
 library(dplyr)
 library(readr)
@@ -75,14 +74,15 @@ drugi_graf <- ggplot(obrestna_mera, aes(x=dospetje, y=obrestna_mera,group=datum,
 
 #3a) Terminske obrestne mere tipa TxU
 terminske_obr_mere <- subset(t(zdruzeno), select = c('6m','12m'))
-napovedi<- (1/(12-6))*(((1+12*dvanajsti_mesec)/(1+6*sesti_mesec))-1)
+napovedi<- ((1/(1-1/12))*(((1+1*dvanajsti_mesec/100)/(1+0.5*sesti_mesec/100))-1))*100
 tabela <-cbind(terminske_obr_mere,napovedi)
 
 
 #3b) Terminska obrestna mera meseca 12-6= 6 
 napovedi2 <- c(c(NA, NA, NA, NA, NA, NA), napovedi[-c(31:36)])
-tabela2 <-cbind(sesti_mesec,napovedi2)
+tabela2 <-cbind(terminske_obr_mere,napovedi2)
 
+#3c) Razsevni grafikon, regresijska premica in simetrala kvadrantov
 
 
 
