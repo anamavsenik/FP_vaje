@@ -74,7 +74,7 @@ drugi_graf <- ggplot(obrestna_mera, aes(x=dospetje, y=obrestna_mera,group=datum,
 
 #3a) Terminske obrestne mere tipa TxU
 terminske_obr_mere <- subset(t(zdruzeno), select = c('6m','12m'))
-napovedi<- ((1/(1-1/12))*(((1+1*dvanajsti_mesec/100)/(1+0.5*sesti_mesec/100))-1))*100
+napovedi<- ((1/(1-(1/2)))*(((1+1*dvanajsti_mesec/100)/(1+0.5*sesti_mesec/100))-1))*100
 tabela <-cbind(terminske_obr_mere,napovedi)
 
 
