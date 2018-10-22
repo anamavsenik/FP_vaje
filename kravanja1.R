@@ -1,15 +1,9 @@
-library(knitr)
 library(dplyr)
 library(readr)
 library(rvest)
-library(gsubfn)
 library(ggplot2)
 library(reshape2)
-library(shiny)
-library(tidyr)
-library(actuar)
-library(combinat)
-library(shiny)
+
 
 #1.NALOGA
 tabela2008 <- read.csv2("Copy of hist_EURIBOR_2008.csv",header = TRUE, sep = ";", quote = "\"", dec = ",", nrows = 15,row.names = 1,
@@ -33,17 +27,16 @@ nova2010 <- t(nova2010[1:15,])
 zdruzeno<-rbind(nova2008,nova2009,nova2010) %>%
   subset(elect=c(1,2,4,5,6,9,12,15))%>%
   as.data.frame()
-#zdruzeno <- zdruzeno[,c(9,15)]
-View(zdruzeno)
+
 
 zdruzeno[] <- lapply(zdruzeno,as.character) %>% lapply(as.numeric)
 
-graf_6m <- ts(zdruzeno$'9', start=c(2008,1),frequency =12)
-graf_12m <- ts(zdruzeno$'15',start=c(2008,1),frequency = 12)
+graf_6m <- ts(zdruzeno$'6m', start=c(2008,1),frequency =12)
+graf_12m <- ts(zdruzeno$'12m',start=c(2008,1),frequency = 12)
+
 
 ts.plot(graf_6m ,graf_12m, xlab='obdobje',ylab='obrestna mera (%)', main = 'Euribor 2008-2010', col=c('green','red'), lwd=2)
-legend("topright",legend=c('6m', '9m'), col=c('green','red'),lty=1:1,cex=1.0)
-
+ legend("topright",legend=c('6m', '9m'), col=c('green','red'),lty=1:1,cex=1.0)
 
 
 #2.naloga
