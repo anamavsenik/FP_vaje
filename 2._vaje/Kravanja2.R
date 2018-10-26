@@ -66,12 +66,35 @@ diskretno <- discretize(pweibull (x,shape=k, scale = lambda),
                         method = 'rounding')
 
 #b.) 
-graf1 <- curve(pweibull(x, shape=k, scale = lambda),
+graf1 <- curve(dweibull(x, shape=k, scale = lambda),
               from = 0, 
               to = 10,
               main = 'Weibullova porazdelitev',
               ylab = 'porazdelitvena funkcija',
-              lwd = 2)
+              lwd = 2,
+              col= 'orange')
 
-plot(stepfun(seq.int(0,n*h,by=h),y = diskretno), add=TRUE)
+plot(stepfun(seq.int(0,n*h,by=h),y = diskretno), 
+     add=TRUE)
+legend("topright", legend=c('diskretizacija', 'Weibullova porazdelitev'), col=c('black','orange'),lty=1:1, cex=0.7)
 
+#c.) porazdelitvena funkcija komulativne škode S
+  
+FS <- aggregateDist(method = 'recursive',
+                    model.freq = 'poisson',
+                    model.sev = diskretno,
+                    lambda = lambda,
+                    x.scale = 0.25,
+                    maxit = 1000000,
+                    tol = 0.005)
+plot(FS,
+     main = 'Porazdelitvena funkcija odškodnin',
+     xlab = 'Višina odškodnine')
+
+#d.) 
+upanjedrugoS <- mean(FS)
+variancadrugaS <- sum(knots(FS)^2 * diff(FS)) - upanjedrugoS^2
+
+
+#3.) Metoda Monte Carlo
+#a.)
