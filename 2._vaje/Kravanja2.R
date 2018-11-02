@@ -53,7 +53,7 @@ upanjeS <- upanjey * upanjen
 
 variancay <- lambda^2 * (gamma(1+ (2/k)) - gamma (1+ (1/k))^2)
 variancan <- n*p* (1-p)
-upanjeyna2 <- varianca_y + upanjey^2
+upanjeyna2 <- variancay + upanjey^2
 variancaS <- variancay * upanjen + variancan * upanjeyna2
 
 # 2.) PANJERJEV ALGORITEM
