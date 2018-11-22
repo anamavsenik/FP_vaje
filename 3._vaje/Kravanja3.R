@@ -55,11 +55,63 @@ binomski <- function(S0,u,d,R,T,W,type){
   return(E)
 }
 
-#b.)
+#b.) simulacija N poti cene delnic z M.C.metodo
+monte <- function(S_0,u,d,R,t,W,type, N){
+  q = (1+R-d) / (u-d)
+  binomskaf <- matrix(rbinom(N*t,1,q),nrow = N, ncol = t)
+  vS_0 <- rep(S_0, N)
+  nova_binomskaf <- cbind(vS_0,u^binomskaf * d^(1-binomskaf))
+  produkt <- t(apply(nova_binomskaf,1, cumprod))
+  izplacilo_vrstice <- apply(produkt, 1, izplacilo, W = W, type = type)
+  stevilo_u <- rowSums(binomskaf)
+  stevilo_d <- t - stevilo_u
+  Q <- q^stevilo_u * (1-q)^stevilo_d
+  E_Q <- sum(izplacilo_vrstice) / N
+  premija <- E_Q / (1+R)^t
+  return (premija)
+}
+
+S_0 <- 60
+u <- 1.05
+d <- 0.95
+R <- 0.01
+t <- 15
+W <- rep(1,16)
+type <- "put"
 N1 <- 10
 N2 <- 100
-N3 <- 1000 
+N3 <- 1000
 
-vrednostN1 <- monte(60, 1.05, 0.95, 15, 0.01, 8, 'put', N1)
-vrednostN2 <- monte(60, 1.05, 0.95, 15, 0.01, 8, 'put', N2)
-vrednostN3 <- monte(60, 1.05, 0.95, 15, 0.01, 8, 'put', N3)
+bin <- binomski(S_0,u,d,R,t,W,type)
+
+#3. naloga
+#3.a
+M = 100
+simulacija1 <- c()
+for(i in 1:M ){
+  simulacija1 <- c(simulacija1,monte(S_0,u,d,R,t,W,type, N1))
+}
+
+simulacija2 <- c()
+for(i in 1:M ){
+  simulacija2 <- c(simulacija2,monte(S_0,u,d,R,t,W,type, N2))
+}
+
+simulacija3 <- c()
+for(i in 1:M ){
+  simulacija3 <- c(simulacija3,monte(S_0,u,d,R,t,W,type, N3))
+}
+
+hist(simulacija1,col="yellow",main="histogram simulacije 1",
+     xlab="porazdelitev ocen premije",ylab= "pogostost")
+hist(simulacija2,col="green",main="histogram simulacije 2",
+     xlab="porazdelitev ocen premije",ylab= "pogostost")
+hist(simulacija3,col="blue",main="histogram simulacije 3",
+     xlab="porazdelitev ocen premije",ylab= "pogostost")
+
+
+#3.b
+hist(simulacija1)
+abline(v = c(mean(simulacija1),bin ),col="red")
+arrows(mean(simulacija1) , 0, mean(simulacija1) + sd(simulacija1),0) #sd raèuna standardni odklon
+arrows(mean(simulacija1) , 0, mean(simulacija1) - sd(simulacija1),0)
