@@ -63,9 +63,7 @@ monte <- function(S_0,u,d,R,t,W,type, N){
   nova_binomskaf <- cbind(vS_0,u^binomskaf * d^(1-binomskaf))
   produkt <- t(apply(nova_binomskaf,1, cumprod))
   izplacilo_vrstice <- apply(produkt, 1, izplacilo, W = W, type = type)
-  stevilo_u <- rowSums(binomskaf)
-  stevilo_d <- t - stevilo_u
-  Q <- q^stevilo_u * (1-q)^stevilo_d
+  Q <- q^rowSums(binomskaf) * (1-q)^(t - rowSums(binomskaf) )
   E_Q <- sum(izplacilo_vrstice) / N
   premija <- E_Q / (1+R)^t
   return (premija)
