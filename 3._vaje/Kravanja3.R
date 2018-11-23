@@ -56,60 +56,79 @@ binomski <- function(S0,u,d,R,T,W,type){
 }
 
 #b.) simulacija N poti cene delnic z M.C.metodo
-monte <- function(S_0,u,d,R,t,W,type, N){
-  q = (1+R-d) / (u-d)
-  binomskaf <- matrix(rbinom(N*t,1,q),nrow = N, ncol = t)
-  vS_0 <- rep(S_0, N)
-  nova_binomskaf <- cbind(vS_0,u^binomskaf * d^(1-binomskaf))
-  produkt <- t(apply(nova_binomskaf,1, cumprod))
-  izplacilo_vrstice <- apply(produkt, 1, izplacilo, W = W, type = type)
-  Q <- q^rowSums(binomskaf) * (1-q)^(t - rowSums(binomskaf) )
-  E_Q <- sum(izplacilo_vrstice) / N
-  premija <- E_Q / (1+R)^t
-  return (premija)
+monte <- function(S0,u,d,R,T,W,type, N){
+  q <- (1+R-d)/(u-d)
+  binfunkcija <- matrix(rbinom(N*T,1,q),nrow = N, ncol = T)
+  zacetni <- rep(S0, nrow(binfunkcija))
+  matrika <- u^(binfunkcija)*d^(1-binfunkcija)
+  skupaj <- cbind(zacetni,matrika)
+  kumulativni_produkti <- t(apply(skupaj, 1, cumprod))
+  X <- apply(kumulativni_produkti, 1, izplacilo, W=W, type=type)
+  Q <- q^(rowSums(binfunkcija))*(1-q)^(T-rowSums(binfunkcija))
+  prièakovano <- sum(X)/N
+  E <- prièakovano/(1+R)^T
+  return(E)
+  
 }
 
-S_0 <- 60
-u <- 1.05
-d <- 0.95
-R <- 0.01
-t <- 15
-W <- rep(1,16)
-type <- "put"
-N1 <- 10
-N2 <- 100
-N3 <- 1000
+#dani podatki:
+S0 = 60
+u = 1.05
+d =0.95
+R=0.01
+T =15
+W = rep(1,16)
+type = "put"
+N1=10
+N2=100
+N3=1000
 
-bin <- binomski(S_0,u,d,R,t,W,type)
+#3.a) doloèimo 100 ponovitev za vsak N in v b delu narišemo histograme, za vsako simulacijo posebej ustvarimo vektor vrednosti
+M=100
 
-#3. naloga
-#3.a
-M = 100
-simulacija1 <- c()
-for(i in 1:M ){
-  simulacija1 <- c(simulacija1,monte(S_0,u,d,R,t,W,type, N1))
+sim1 <- c()
+sim2 <- c()
+sim3 <- c()
+
+for(i in 1:M){
+  sim1 <- c(sim1,monte(S0,u,d,R,T,W,type, N1))
+  sim2 <- c(sim2,monte(S0,u,d,R,T,W,type, N2))
+  sim3 <- c(sim3,monte(S0,u,d,R,T,W,type, N3))
 }
 
-simulacija2 <- c()
-for(i in 1:M ){
-  simulacija2 <- c(simulacija2,monte(S_0,u,d,R,t,W,type, N2))
-}
 
-simulacija3 <- c()
-for(i in 1:M ){
-  simulacija3 <- c(simulacija3,monte(S_0,u,d,R,t,W,type, N3))
-}
+#3.b) na vse tri histograme dodamo navpiènice, ki oznaèujejo obe povpreèji in pušèice standardnega odklona
 
-hist(simulacija1,col="yellow",main="histogram simulacije 1",
-     xlab="porazdelitev ocen premije",ylab= "pogostost")
-hist(simulacija2,col="green",main="histogram simulacije 2",
-     xlab="porazdelitev ocen premije",ylab= "pogostost")
-hist(simulacija3,col="blue",main="histogram simulacije 3",
-     xlab="porazdelitev ocen premije",ylab= "pogostost")
+povprecje0 <- binomski(S0,u,d,R,T,W,type)
+povprecje1 <- mean(sim1)
+povprecje2 <- mean(sim2)
+povprecje3 <- mean(sim3)
+odklon1 <- sd(sim1)
+odklon2 <- sd(sim2)
+odklon3 <- sd(sim3)
+
+hist(sim1, col="red", main="Histogram prve porazdelitve N=10",
+     xlim=c(0,4),
+     xlab="cena premije",
+     ylab="gostota v porazdelitvi")
+abline(v=c(povprecje0, povprecje1), col=c("yellow", "blue"), lty=c(1,2), lwd=c(2,3))
+arrows(povprecje1, 0, c(povprecje1 - odklon1, povprecje1 + odklon1), 0, col="green", lwd=3)
+legend("topright", legend=c("binomsko", "monte carlo", "standardni odklon"), col=c("yellow","blue", "green"),lty=c(1,2,1), lwd=c(2,3,3))
+
+hist(sim2, col="blue", main="Histogram druge porazdelitve N=100",
+     xlim=c(0,4),
+     xlab="cena premije",
+     ylab="gostota v porazdelitvi")
+abline(v=c(povprecje0, povprecje2), col=c("yellow", "red"), lty=c(1,2), lwd=c(2,3))
+arrows(povprecje2, 0, c(povprecje2 - odklon2, povprecje2 + odklon2), 0, col="green", lwd=3)
+legend("topright", legend=c("binomsko", "monte carlo", "standardni odklon"), col=c("yellow","red", "green"),lty=c(1,2,1), lwd=c(2,3,3))
+
+hist(sim3, col="green", main="Histogram tretje porazdelitve N=1000",
+     xlim=c(0,4),
+     xlab="cena premije",
+     ylab="gostota v porazdelitvi")
+abline(v=c(povprecje0, povprecje3), col=c("blue", "red"), lty=c(1,2), lwd=c(2,3))
+arrows(povprecje3, 0, c(povprecje3 - odklon3, povprecje3 + odklon3), 0, col="yellow", lwd=3)
+legend("topright", legend=c("binomsko", "monte carlo", "standardni odklon"), col=c("blue","red", "yellow"),lty=c(1,2,1), lwd=c(2,3,3))
 
 
-#3.b
-hist(simulacija1)
-abline(v = c(mean(simulacija1),bin ),col="red")
-arrows(mean(simulacija1) , 0, mean(simulacija1) + sd(simulacija1),0) #sd raèuna standardni odklon
-arrows(mean(simulacija1) , 0, mean(simulacija1) - sd(simulacija1),0)
