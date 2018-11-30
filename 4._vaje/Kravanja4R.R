@@ -7,12 +7,11 @@ tabela <- read_csv("srebro.csv")
 tabela <- tabela[0:123,]
 tabela <- tabela[123:0,]
 
-
 #b.)
 
 casovna_vrsta <- ts(tabela$Close)
 casovna_vrsta <- as.numeric(gsub("\\$", "", casovna_vrsta))
-View(casovna_vrsta)
+
 
 graf <- ts.plot(casovna_vrsta,xlab="Èas",
                 ylab="Vrednost v €", 
@@ -69,6 +68,41 @@ srednja_kvadraticna_15 <- skn(casovna_vrsta,30)
 
 
 #3.naloga: EKSPONENTNO GLAJENJE
+#3.a)
+EG <- function(vrsta,alpha){
+  konec <- length(vrsta)
+  zglajene_vrednosti <- vrsta[1]
+  for (i in 2:konec){
+    zglajene_vrednosti[i] <- alpha * vrsta[i] +(1-alpha)*zglajene_vrednosti[i-1]
+  }
+  zglajena_vrsta <- ts(zglajene_vrednosti)
+  return(zglajena_vrsta)
+}
 
+#b.)
+eks <-ts(EG(casovna_vrsta,0.3))
+zglajen_graf3 <- ts.plot(eks,ts(casovna_vrsta), 
+                         col=c('blue','red'))
+naslednji<- tail(eks,n=1)
+
+#c.)
+skn_e <- function(vrsta, alpha){
+  dolzina <- length(vrsta)
+  napaka <- 0
+  glajena <- EG(vrsta, alpha)
+  for (i in 1:(dolzina-1)){
+    napaka <- napaka + (vrsta[i+1] - glajena[i+1])^2
+  }
+  return(napaka/(dolzina-1))
+}
+
+opt_alpha <- optimize(skn_e, c(0,1), vrsta = casovna_vrsta)
+
+
+#d.)
+eks2 <-ts(EG(casovna_vrsta,opt_alpha$minimum))
+
+zglajen_graf4 <- ts.plot(eks2,ts(casovna_vrsta), 
+                         col=c('green','orange'))
 
 
