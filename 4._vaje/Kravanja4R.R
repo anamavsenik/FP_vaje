@@ -82,7 +82,12 @@ EG <- function(vrsta,alpha){
 #b.)
 eks <-ts(EG(casovna_vrsta,0.3))
 zglajen_graf3 <- ts.plot(eks,ts(casovna_vrsta), 
-                         col=c('blue','red'))
+                         col=c('blue','red'),
+                         xlab="Äasovno zaporedje",
+                         ylab="cene",
+                         main="Graf èasovne vrste ") +
+  points(casovna_vrsta, cex=0.7) 
+legend("topright",c("Èasovna vrsta", "zglajena vrsta ekspon. glajenja"), lty=1:1, col=c("red", "blue"))
 naslednji<- tail(eks,n=1)
 
 #c.)
@@ -103,6 +108,12 @@ opt_alpha <- optimize(skn_e, c(0,1), vrsta = casovna_vrsta)
 eks2 <-ts(EG(casovna_vrsta,opt_alpha$minimum))
 
 zglajen_graf4 <- ts.plot(eks2,ts(casovna_vrsta), 
-                         col=c('green','orange'))
+                         col=c("green", "red"),
+                         xlab="Èasovno zaporedje",
+                         ylab="cene",
+                         main="Graf èasovne vrste 5",
+                         lwd=2:1) +
+  points(casovna_vrsta, cex=0.5) 
+legend("topright",c("Èasovna vrsta", "zglajena vrsta optimizirana"),lty=1:1, lwd=2:1, col=c("green", "red"))
 
 
